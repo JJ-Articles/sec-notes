@@ -1,0 +1,20 @@
+{
+  "name": "sec-notes",
+  "version": "0.0.1",
+  "author": {
+    "name": "Julian Johannesen",
+    "email": "julian.johannesen@gmail.com",
+    "url": "https://www.github.com/julianjohannesen"
+  },
+  "contributors": [],
+  "description": "A set of notes on security concerns in web development.",
+  "keywords": ["security", "web development"],
+  "homepage":"https://julianjohannesen.github.io/sec-notes",
+  "repository": "https://github.com/JJ-Articles/sec-notes",
+  "bugs": "https://github.com/JJ-Articles/sec-notes/issues",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT"
+}
