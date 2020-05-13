@@ -4,21 +4,23 @@ In this article we're going to talk about Cross-Origin Resource Sharing, a.k.a C
 
 ## What happens when you navigate to a web page?
 
-There are a lot of different ways to answer this question. What we need is an answer that will help us understand CORS. Here's a quick and dirty explanation that will help us later.
+There are a lot of different ways to answer this question. What we need is an answer that will help us understand CORS. Here's a simplified explanation that will help us later.
 
 When you navigate to a web page, your browser sends a message to a server.  The server receives the message and sends a message back. Often, the message from the server contains an HTML document. After receiving the HTML document, your browser then sends several other messages, asking for things like CSS files, images, etc. and in the process builds and displays the new page.
 
-Quick and dirty indeed, but good enough for our purposes. 
+Simplified indeed, but good enough for our purposes. Now let's talk about those messages in more detail. 
 
-Let's talk about those messages. The message that your browser sends is called an HTTP GET request. Let's break that down.
+## HTTP Requests
 
-HTTP is a protocol that specifies how a client and a server can go about exchanging certain kinds of information. The HTTP protocol deals with HTML documents, images, and a few other things. Other protocols deal with still more types of information. For example, mailto and FTP deal with email and files, respectively. 
+The message that your browser sends is called an **HTTP GET request**. Let's break that down.
 
-Let's skip to the "request" part of "HTTP GET request" for a minute. There are two types of HTTP messages: requests and responses. Both message types include three parts - a starting line, some headers, and an optional body.  In a request, the starting line tells the server what the client would like to do. Maybe the client wants an HTML document. Maybe it wants to send the server information from a form you filled out. The request headers contain more detailed information about exactly what the client wants. Maybe the client wants an image that's only available from a second server located somewhere else. Maybe it wants a document that is available only to a client with proper credentials. The request headers are where the client supplies that sort of information. The request body is often empty, but in the case where your client is sending a server information from a form, the message body is where the server will find that information.
+**HTTP** is a protocol that specifies how a client and a server can go about exchanging certain kinds of information. The HTTP protocol deals with HTML documents, images, and a few other things. Other protocols deal with other types of information. For example, mailto and FTP deal with email and files, respectively. 
 
-Now let's return to the "GET" portion of "HTTP GET request." HTTP specifies a set of operations that clients can perform. GET and POST are two of the most common. When you navigate to a web page, your browser sends a GET request to a server. When you submit a form, your browser sends a POST request to a server.
+Let's skip to the **request** part of "HTTP GET request" for a minute. There are two types of HTTP messages: requests and responses. Both message types include three parts - a starting line, some headers, and an optional body.  In a request, the **starting line** very briefly tells the server what the client would like to do.  The request **headers** contain more detailed information about exactly what the client wants. For example, the client might want a document that's available only if the client has proper credentials. The request headers are where the client supplies that sort of information. The request **body** is often empty, but in the case where your client sends a server information from a form, the message body is where the server will find that information.
 
-Here's an example of a GET request to "example.com" using Google Chrome on Windows:
+Now let's return to the **GET** portion of "HTTP GET request." HTTP defines several request methods. GET and POST are two of the most common. When you navigate to a web page, your browser sends a GET request to a server. When you submit a form, your browser sends a POST request to a server. The other two types of request that you're likely to run into are UPDATE and DELETE. Together these four request methods allow a client to create, read, update, and delete resources, as long as the server accepts those requests.
+
+Here's what the GET request to "example.com" looks like when I type the URL into my address bar in Google Chrome on Windows:
 
 ```HTTP
 GET / HTTP/1.1 
@@ -34,7 +36,46 @@ Accept-Encoding: gzip, deflate
 Accept-Language: en-US,en;q=0.9
 ```
 
-How does a server respond to your browser's request?
+I know that that looks like a lot, but don't worry. You won't often have to deal directly with headers like these. That's a relief, because, even though only the stating line and host header are required, messages often include a great many headers. 
+
+### What do all those headers mean?
+- The first line is the starting line. It requests the page located at "/" for the host example.com, using the HTTP protocol, version 1.1. Each of the headers below the first line tells the server something about this particular request. 
+- "Host: example.com" provides the domain name of the sought after page. 
+- "Connection: keep-alive" asks the server not to immediately terminate the connection it has with the client after responding to the request. 
+- "Pragma: no-cache" and "Cache-Control: no-cache" both ask the server to specify in its response that the response should not be used by the client to fulfill subsequent requests without first checking in with the server. 
+- "DNT: 1" asks the server not to track the client's user information.
+- "Upgrade-Insecure-Requests: 1" asks the server to respond over a secure https connection, if one is available.
+- User-Agent tells the server a bit more about the client making the request.
+- Accept tells the server what sort of data the client will accept.
+- "Accept-Encoding: gzip, deflate" tells the server that it can feel free to compress its response.
+- Accept-Language: en-US,en;q=0.9 tells the server the client's preferred languages.
+
+## HTTP Responses
+
+So, we've covered how a client sends a request message to a server, but we haven't talked about how the server responds. As we noted above, the HTTP response message also has a starting line, headers, and body. In a response, we call the starting line the status line. It tells the browser whether the request was successful. The headers provide information about the server and the resource sent to the client. The body contains the resource.
+
+Here's what the status line and headers in the response to my request to "example.com" look like:
+
+```HTTP
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Age: 461924
+Cache-Control: max-age=604800
+Content-Type: text/html; charset=UTF-8
+Date: Wed, 13 May 2020 16:50:48 GMT
+Etag: "3147526947"
+Expires: Wed, 20 May 2020 16:50:48 GMT
+Last-Modified: Thu, 17 Oct 2019 07:18:26 GMT
+Server: ECS (bsa/EB24)
+Vary: Accept-Encoding
+X-Cache: HIT
+Content-Length: 1256
+```
+
+### What do all those headers mean?
+- The status line tells the client whether the request succeeded. 
+- "Accept-Ranges: bytes" tells the client that the server allows things like pausing and resuming a large download.
+- "Age: 
 
 ## What is the same-origin policy?
 Short version: The same-origin-policy prevents bad guys from hacking your browser and doing all sorts of horrible things like stealing your credit card information. 
