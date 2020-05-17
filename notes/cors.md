@@ -4,13 +4,17 @@ In this article we're going to talk about Cross-Origin Resource Sharing, a.k.a C
 
 ## What happens when you navigate to a web page?
 
-There are a lot of different ways to answer this question. What we need is an answer that will help us understand CORS. Here's a simplified explanation that will help us later.
+There are a lot of different ways to answer this question. What we need is as simple an answer as is possible, while still providing us enough information to understand CORS. Here goes.
 
 When you navigate to a web page, your browser sends a message to a server.  The server receives the message and sends a message back. Often, the message from the server contains an HTML document. After receiving the HTML document, your browser then sends several other messages, asking for things like CSS files, images, etc. and in the process builds and displays the new page.
 
+MIGHT NEED MORE ABOUT PROXY SERVERS AND MODERN WEB ARCHITECTURE: CDN'S ETC.
+
 Simplified indeed, but good enough for our purposes. Now let's talk about those messages in more detail. 
 
-## HTTP Requests
+On the modern web, some of the resources requested by your browser will be served by servers that are between you and the original server. 
+
+## What's an HTTP Request?
 
 The message that your browser sends is called an **HTTP GET request**. Let's break that down.
 
@@ -36,21 +40,9 @@ Accept-Encoding: gzip, deflate
 Accept-Language: en-US,en;q=0.9
 ```
 
-I know that that looks like a lot, but don't worry. You won't often have to deal directly with headers like these. That's a relief, because, even though only the stating line and host header are required, messages often include a great many headers. 
+I know that that looks like a lot, but don't worry. You won't often have to deal directly with headers like these. That's a relief, because, even though only the stating line and host header are required, messages often include a great many headers. (Here's a breakdown of all those headers.)
 
-### What do all those headers mean?
-- The first line is the starting line. It requests the page located at "/" for the host example.com, using the HTTP protocol, version 1.1. Each of the headers below the first line tells the server something about this particular request. 
-- "Host: example.com" provides the domain name of the sought after page. 
-- "Connection: keep-alive" asks the server not to immediately terminate the connection it has with the client after responding to the request. 
-- "Pragma: no-cache" and "Cache-Control: no-cache" both ask the server to specify in its response that the response should not be used by the client to fulfill subsequent requests without first checking in with the server. 
-- "DNT: 1" asks the server not to track the client's user information.
-- "Upgrade-Insecure-Requests: 1" asks the server to respond over a secure https connection, if one is available.
-- User-Agent tells the server a bit more about the client making the request.
-- Accept tells the server what sort of data the client will accept.
-- "Accept-Encoding: gzip, deflate" tells the server that it can feel free to compress its response.
-- Accept-Language: en-US,en;q=0.9 tells the server the client's preferred languages.
-
-## HTTP Responses
+## What's an HTTP Response?
 
 So, we've covered how a client sends a request message to a server, but we haven't talked about how the server responds. As we noted above, the HTTP response message also has a starting line, headers, and body. In a response, we call the starting line the status line. It tells the browser whether the request was successful. The headers provide information about the server and the resource sent to the client. The body contains the resource.
 
@@ -72,10 +64,19 @@ X-Cache: HIT
 Content-Length: 1256
 ```
 
-### What do all those headers mean?
-- The status line tells the client whether the request succeeded. 
-- "Accept-Ranges: bytes" tells the client that the server allows things like pausing and resuming a large download.
-- "Age: 
+Again, there's a lot there, but you won't often have to deal with those headers directly. (Here's a breakdown of all those headers.)
+
+DO WE NEED TO TALK MORE ABOUT HOW RESOURCES ARE SENT TO THE CLIENT? SESSIONS? COOKIES? AUTHENTICATION? WE'VE COVERED THE BARE ESSENTIALS. THE CLIENT REQUESTS A RESOURCE FROM A SERVER. THE SERVER SENDS IT. WHAT ABOUT THAT REQUIRES SOP AND CORS? IS THERE ANYTHING MORE THE READER NEEDS TO UNDERSTAND.
+
+## Who are the bad guys?
+
+Now we know a bit more about how clients and servers exchange messages and what those message look like. But what does any of that have to do with CORS?
+
+The first tool in the bad guy's tool belt is Cross-Site Scripting, a.k.a. XSS. 
+
+### What is XSS?
+
+Imagine the following scenario. You have three tabs open in your browser. In one tab, you've opened your mail account. In another, you've logged into a social media account. In a third tab, your reading a post on a friend's blog. Your friend's blog site depends on a variety of resources, including CSS files, images, multimedia, and scripts from various places around the web. Furthermore, when your friend built their blog, they used dozens of third-party modules. Each of those resources and modules represents an attack vector. It only takes one polluted resource or module to endanger your data. 
 
 ## What is the same-origin policy?
 Short version: The same-origin-policy prevents bad guys from hacking your browser and doing all sorts of horrible things like stealing your credit card information. 
